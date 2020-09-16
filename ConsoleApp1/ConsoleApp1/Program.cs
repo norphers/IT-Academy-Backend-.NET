@@ -9,9 +9,10 @@ namespace ConsoleApp1
         static string surname = "Doe";
         static int day = 25;
         static int month = 10;
-        static int year = 1954;
+        static int year = 1988;
         static int leapYear = 1948;
         static bool isLeapYear;
+        static int currentYear = 2020;
 
         static void Main(string[] args)
         {
@@ -31,7 +32,9 @@ namespace ConsoleApp1
         }
         public static void printSolutionStage2()
         {
-            calculLeapYearsBetweenTwoYears(year,leapYear);
+            Console.Write("Leap years generator: ");
+            printLeapYearsArray(leapYearsGenerator(leapYear,currentYear));
+            Console.WriteLine("Leap years between " + leapYear + " and " + year + ": " + calculLeapYearsBetweenTwoYears(year, leapYear));
         }
         public static void printSolutionStage3()
         {
@@ -58,10 +61,31 @@ namespace ConsoleApp1
             }
         }
 
-        public static void calculLeapYearsBetweenTwoYears(int newestYear, int oldestYear)
+        public static int[] leapYearsGenerator(int leapYear, int currentYear)
+        {
+            int arraySize = calculLeapYearsBetweenTwoYears(currentYear, leapYear);
+            int[] leapYears = new int[arraySize+1];
+            for (int i = 0; i < leapYears.Length; i++)
+            {
+                leapYears[i] = leapYear;
+                leapYear += 4;
+            }
+            return leapYears;
+        }
+
+        public static void printLeapYearsArray(int[] leapYears)
+        {
+            for (int i = 0; i < leapYears.Length; i++)
+            {
+                if (i < leapYears.Length - 1) Console.Write(leapYears[i] + ", ");
+                else Console.Write(leapYears[i] + ".\n");
+            }
+        }
+
+        public static int calculLeapYearsBetweenTwoYears(int newestYear, int oldestYear)
         {
             int result = (newestYear - oldestYear) / 4;
-            Console.WriteLine("Leap years between " + oldestYear + " and " + newestYear + ": " +result);
+            return result;
         }
 
         public static string checkLeapYear(int year)
