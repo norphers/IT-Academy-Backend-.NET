@@ -25,6 +25,8 @@ namespace ConsoleApp3
             Console.WriteLine("\nStage3");
             Stage3();
 
+            Console.WriteLine("\nStage4");
+            Stage4();
         }
 
         static void Stage1()
@@ -59,13 +61,25 @@ namespace ConsoleApp3
 
         static void Stage3()
         {
-            citiesCharModifier(cities);
+            CitiesCharModifier(cities);
             PrintArray(citiesModified);
         }
 
         static void Stage4()
         {
+            char[] cityArray1 = new char[city1.Length];
+            char[] cityArray2 = new char[city2.Length];
+            char[] cityArray3 = new char[city3.Length];
+            char[] cityArray4 = new char[city4.Length];
+            char[] cityArray5 = new char[city5.Length];
+            char[] cityArray6 = new char[city6.Length];
 
+            PrintSortReverseArray(CityArrayGen(cityArray1, city1));
+            PrintSortReverseArray(CityArrayGen(cityArray2, city2));
+            PrintSortReverseArray(CityArrayGen(cityArray3, city3));
+            PrintSortReverseArray(CityArrayGen(cityArray4, city4));
+            PrintSortReverseArray(CityArrayGen(cityArray5, city5));
+            PrintSortReverseArray(CityArrayGen(cityArray6, city6));
         }
 
         static string SetCity()
@@ -99,7 +113,7 @@ namespace ConsoleApp3
             }
 	    }
 
-        static string[] citiesCharModifier(string[] cities)
+        static string[] CitiesCharModifier(string[] cities)
         {
             for (int i = 0; i < citiesModified.Length;)
             {
@@ -128,6 +142,24 @@ namespace ConsoleApp3
                 }
                 
             }
+        }
+
+        static char[] CityArrayGen(char[] cityArray, String city)
+        {
+            for (int i = 0; i < city.Length; i++)
+            {
+                cityArray[i] = city[i];
+            }
+            return cityArray;
+        }
+
+        static void PrintSortReverseArray(char[] cityArray)
+        {
+            for (int i = cityArray.Length - 1; i < cityArray.Length && i > -1; i--)
+            {
+                Console.Write(cityArray[i]);
+            }
+            Console.WriteLine();
         }
 
     }
