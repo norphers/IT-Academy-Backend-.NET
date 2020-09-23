@@ -3,62 +3,116 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Transactions;
 using System.Dynamic;
+using Microsoft.Win32.SafeHandles;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace ConsoleApp4
 {
     class Program
     {
-        static User admin = new User("admin", "john", "doe", "1234", DateTime.Now);
         static List<User> userRepository = new List<User>();
-        static List<Video> videoRepository = new List<Video>();
+        static User userSesion;
         static void Main(string[] args)
         {
-            userRepository.Add(admin);
-            Console.WriteLine("WELCOME TO YOU NEW VIDEO APP.");
-            string option = OptionPanel();
-            if (option.Equals("1"))
-            {
-                Video video1 = setVideo();
-                videoRepository.Add(video1);
-            }
-            else if (option.Equals("2"))
-            {
-                Console.WriteLine(videoRepository); 
-            }
-            else if (option.Equals("3"))
-            {
-                User newUser = setUser();
-                userRepository.Add(newUser);
-            }
+            AddData();
+            AuthenticationModule();
+            
+            Console.WriteLine("Hello " + userSesion.GetName() + " " + userSesion.GetSurname());
+            
+            Menu();
+
+
+            // estructura de menus
+
+            // crear video
+            // cambiar estado de video (play/pause/stop)
+            // añadir nuevos tags en el video
 
         }
 
-        public static string OptionPanel()
+
+        //----------------------------------------------//
+
+        public static void AddData()
+        {
+            userRepository.Add(new User("admin", "Bilbo", "Baggins", "1234", DateTime.Now));
+            userRepository.Add(new User("user1", "Frodo", "Baggind", "5678", DateTime.Now));
+            userRepository.Add(new User("user2", "Samwise", "Gamgee", "9101", DateTime.Now));
+        }
+        public static void PrintUserRepository(List<User> repository)
+        {
+            foreach (User one in userRepository)
+            {
+                Console.WriteLine(one.ToString());
+            }
+        }
+        public static void AuthenticationModule()
+        {
+            Boolean authResponse;
+            int attempt = 0;
+            do
+            {
+                Console.WriteLine("WELCOME TO YOU NEW VIDEO APP.");
+                authResponse = Authentication();
+                attempt++;
+                if (attempt == 3) { Environment.Exit(0); }
+            } while (authResponse == false);
+        }
+        public static Boolean Authentication()
+        {
+            string usernameAuth;
+            string passwordAuth;
+            Boolean authResponse = false;
+
+            Console.Write("username: ");
+            usernameAuth = Console.ReadLine();
+            Console.Write("pasword: ");
+            passwordAuth = Console.ReadLine();
+
+            foreach (User one in userRepository)
+            {
+                if (one.GetUsername().Equals(usernameAuth) && one.GetPassword().Equals(passwordAuth))
+                {
+                    authResponse = true;
+                    one.SetToken(System.Guid.NewGuid().ToString());
+                    userSesion = one;
+                    Console.Clear();
+                }
+            }
+            if (authResponse == false)
+            {
+                Console.WriteLine("Login failed");
+                Console.Clear();
+            }
+            return authResponse;
+        }
+        public static void Menu()
         {
             Console.WriteLine("What do you want to do?");
-            Console.WriteLine("1 - Create new video\n" + "2 - Check your Video Repository\n" + "3 - Create new User\n" + "Select option 1, 2 or 3\n");    
-            string response = Console.ReadLine();
-            Boolean whileStatement;
-            do {
-                if (response.Equals("1"))
-                {
-                    whileStatement = true;
-                }
-                else if (response.Equals("2"))
-                {
-                    whileStatement = true;
-                }
-                else if (response.Equals("3"))
-                {
-                    whileStatement = true;
-                }
-                else
-                {
-                    Console.WriteLine("sorry I don not understand you. Please insert 1, 2 or 3.");
-                    whileStatement = false;
-                }
-            } while (whileStatement==false);
-            return response;
+            Console.WriteLine("1 - New video\n" + "2 - Edit Video\n" + "3 - Delete Video\n" + "4 - Show Video Repository\n");
+            Console.Write("Select option: ");
+
+            switch (Console.Read())
+            {
+                case '1':
+                    Console.Write("New video.");
+                    // Continuar lógica y extraer métodos //
+                    break;
+                case '2':
+                    Console.Write("Edit video.");
+                    // Continuar lógica y extraer métodos //
+                    break;
+                case '3':
+                    Console.Write("Delete video.");
+                    // Continuar lógica y extraer métodos //
+                    break;
+                case '4':
+                    Console.Write("Show video repository");
+                    // Continuar lógica y extraer métodos //
+                    break;
+            }
+            Console.ReadKey();
         }
 
         public static User setUser()
@@ -87,7 +141,6 @@ namespace ConsoleApp4
             List<string> tags = CreateTags();
             return newVideo;
         }
-
         public static List<string> CreateTags()
         {
             List<string> tags = new List<string>();
@@ -101,7 +154,6 @@ namespace ConsoleApp4
             } while (exit == false);
             return tags;
         }
-
         public static Boolean Exit()
         {
             Boolean response;
@@ -134,39 +186,43 @@ namespace ConsoleApp4
     //---------------------------------------------------------------------//
 
 
-    class Video
+    public class Video
     {
+        public enum State
+        {
+            Play, Pause, Stop
+        }
+
         private string url;
         private string title;
         private List<string> tags = new List<string>();
-
+        private State state;
+        
         public Video()
         {
 
         }
 
-        public Video(string url, string title, List<string> tags)
+        public Video(string url, string title, List<string> tags, State state)
         {
             this.url = url;
             this.title = title;
             this.tags = tags;
+            this.state = state;
         }
 
         public string GetUrl()
         {
             return this.url;
         }
-
         public void SetUrl(string url)
         {
             this.url = url;
         }
-
         public string GetTitle()
         {
             return this.title;
         }
-
         public void SetTitle(string title)
         {
             this.title = title;
@@ -179,17 +235,25 @@ namespace ConsoleApp4
         {
             this.tags = tags;
         }
-
+        public State GetState()
+        {
+            return this.state;
+        }
+        public void SetState(State state)
+        {
+            this.state = state;
+        }
     }
 
-    class User
+    public class User
     {
-        private string username;
         private string name;
         private string surname;
+        private string username;
         private string password;
         private DateTime registerDate;
-
+        private List<Video> videoRepository = new List<Video>();
+        private string token = "";
         public User()
         {
 
@@ -202,23 +266,33 @@ namespace ConsoleApp4
             this.surname = surname;
             this.password = password;
             this.registerDate = registerDate;
+            
+        }
+
+        public User(string token)
+        {
+            this.token = token;
+        }
+
+        public void SetUserVideoRepository(List<Video> videoRepository)
+        {
+            this.videoRepository = videoRepository;
         }
 
         public string GetUsername()
         {
             return this.username;
         }
-
         public void SetUsername(string username)
         {
+            // condition ? consequent : alternative
+            //username != string.Empty && username != null ? this.username=username : throw new ArgumentNullException("username cannot be empty or null");
             this.username = username;
         }
-
         public string GetName()
         {
             return this.name;
         }
-
         public void SetName(string name)
         {
             this.name = name;
@@ -227,7 +301,6 @@ namespace ConsoleApp4
         {
             return this.surname;
         }
-
         public void SetSurname(string surname)
         {
             this.surname = surname;
@@ -236,7 +309,6 @@ namespace ConsoleApp4
         {
             return this.password;
         }
-
         public void SetPassword(string password)
         {
             this.password = password;
@@ -245,13 +317,29 @@ namespace ConsoleApp4
         {
             return this.registerDate;
         }
-
         public void SetRegisterDate(DateTime registerDate)
         {
             this.registerDate = registerDate;
         }
-
+        public List<Video> GetVideoRepository()
+        {
+            return this.videoRepository;
+        }
+        public void SetVideoRepository(List<Video> videoRepository)
+        {
+            this.videoRepository = videoRepository;
+        }
+        public string GetToken()
+        {
+            return this.token;
+        }
+        public void SetToken(string token)
+        {
+            this.token = token;
+        }
+        public override string ToString()
+        {
+            return base.ToString() + ": " + name.ToString() + " " + surname.ToString() + ", username: " + username.ToString() + " password: " + password.ToString() + ", tokenAUTH: " + token.ToString();
+        }
     }
-
-
 }
