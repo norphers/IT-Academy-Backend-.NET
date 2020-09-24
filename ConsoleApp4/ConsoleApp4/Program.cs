@@ -6,24 +6,23 @@ using System.Dynamic;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.VisualBasic.CompilerServices;
+using System.Net.Http.Headers;
 
 namespace ConsoleApp4
 {
     class Program
     {
         static List<User> userRepository = new List<User>();
+        static List<Video> videoRepository = new List<Video>();
         static User userSesion;
         static void Main(string[] args)
         {
             AddData();
             AuthenticationModule();
-            
-            Console.WriteLine("Hello " + userSesion.GetName() + " " + userSesion.GetSurname());
-            
             Menu();
 
 
-            // estructura de menus
+        
 
             // crear video
             // cambiar estado de video (play/pause/stop)
@@ -39,12 +38,25 @@ namespace ConsoleApp4
             userRepository.Add(new User("admin", "Bilbo", "Baggins", "1234", DateTime.Now));
             userRepository.Add(new User("user1", "Frodo", "Baggind", "5678", DateTime.Now));
             userRepository.Add(new User("user2", "Samwise", "Gamgee", "9101", DateTime.Now));
+            videoRepository.Add(new Video("user1", "www.example.com/user1", "Title1", ({ "","","" }), Video.State.Stop));
+            //string username, string url, string title, List< string > tags, State state
         }
         public static void PrintUserRepository(List<User> repository)
         {
-            foreach (User one in userRepository)
+            foreach (User one in repository)
             {
                 Console.WriteLine(one.ToString());
+            }
+        }
+        public static void PrintVideoRepository(List<Video> repository)
+        {
+
+            foreach (Video one in repository)
+            {
+                if (one.GetUsername().Equals(userSesion.GetUsername()))
+                {
+                    Console.WriteLine(one.ToString());
+                }  
             }
         }
         public static void AuthenticationModule()
@@ -89,8 +101,9 @@ namespace ConsoleApp4
         }
         public static void Menu()
         {
+            Console.Write($"Hello {userSesion.GetName()} {userSesion.GetSurname()}. ");
             Console.WriteLine("What do you want to do?");
-            Console.WriteLine("1 - New video\n" + "2 - Edit Video\n" + "3 - Delete Video\n" + "4 - Show Video Repository\n");
+            Console.WriteLine("1 - New video\n2 - Edit Video\n3 - Delete Video\n4 - Show Video Repository\n");
             Console.Write("Select option: ");
 
             switch (Console.Read())
@@ -115,7 +128,7 @@ namespace ConsoleApp4
             Console.ReadKey();
         }
 
-        public static User setUser()
+        public static User SetUser()
         {
             User newUser = new User();
             Console.WriteLine("Create new user.");
@@ -130,7 +143,7 @@ namespace ConsoleApp4
             newUser.SetRegisterDate(DateTime.Now);
             return newUser;
         }
-        public static Video setVideo()
+        public static Video SetVideo()
         {
             Video newVideo = new Video();
             Console.WriteLine("Create new video.");
@@ -192,25 +205,24 @@ namespace ConsoleApp4
         {
             Play, Pause, Stop
         }
-
+        private string username;
         private string url;
         private string title;
         private List<string> tags = new List<string>();
-        private State state;
-        
+        private State state = State.Stop;
+
         public Video()
         {
 
         }
-
-        public Video(string url, string title, List<string> tags, State state)
+        public Video(string username, string url, string title, List<string> tags, State state)
         {
+            this.username = username;
             this.url = url;
             this.title = title;
             this.tags = tags;
             this.state = state;
         }
-
         public string GetUrl()
         {
             return this.url;
@@ -243,6 +255,18 @@ namespace ConsoleApp4
         {
             this.state = state;
         }
+        public string GetUsername()
+        {
+            return username;
+        }
+        public void SetUsername(string username)
+        {
+            this.username = username;
+        }
+        public override string ToString()
+        {
+            return base.ToString() + ": " + url.ToString() + " " + title.ToString() + ", tags: " + tags.ToString();
+        }
     }
 
     public class User
@@ -251,14 +275,12 @@ namespace ConsoleApp4
         private string surname;
         private string username;
         private string password;
-        private DateTime registerDate;
-        private List<Video> videoRepository = new List<Video>();
+        private DateTime registerDate; 
         private string token = "";
         public User()
         {
 
         }
-
         public User(string username, string name, string surname, string password, DateTime registerDate)
         {
             this.username = username;
@@ -268,17 +290,10 @@ namespace ConsoleApp4
             this.registerDate = registerDate;
             
         }
-
         public User(string token)
         {
             this.token = token;
         }
-
-        public void SetUserVideoRepository(List<Video> videoRepository)
-        {
-            this.videoRepository = videoRepository;
-        }
-
         public string GetUsername()
         {
             return this.username;
@@ -320,14 +335,6 @@ namespace ConsoleApp4
         public void SetRegisterDate(DateTime registerDate)
         {
             this.registerDate = registerDate;
-        }
-        public List<Video> GetVideoRepository()
-        {
-            return this.videoRepository;
-        }
-        public void SetVideoRepository(List<Video> videoRepository)
-        {
-            this.videoRepository = videoRepository;
         }
         public string GetToken()
         {
