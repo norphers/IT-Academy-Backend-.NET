@@ -7,6 +7,7 @@ using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.VisualBasic.CompilerServices;
 using System.Net.Http.Headers;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ConsoleApp4
 {
@@ -17,29 +18,100 @@ namespace ConsoleApp4
         static User userSesion;
         static void Main(string[] args)
         {
-            AddData();
+            LoadData();
             AuthenticationModule();
             Menu();
 
-
-        
-
-            // crear video
-            // cambiar estado de video (play/pause/stop)
-            // añadir nuevos tags en el video
-
+            // add tags to Video
+            // option 2 (edit video)
+            // delete video
         }
 
 
         //----------------------------------------------//
+        
+        public static void Menu()
+        {
+            Console.Write($"Hello {userSesion.GetName()} {userSesion.GetSurname()}. ");
+            Console.WriteLine("What do you want to do?");
+            Console.WriteLine("1 - New video\n2 - Edit Video\n3 - Delete Video\n4 - Show Video Repository\n");
+            Console.Write("Select option: ");
+            string option = Console.ReadLine();
+            if (option.Equals("1"))
+            {
+                Console.Clear();
+                Console.Write("Create new video.");
+                CreateVideo();
+                Continue();
+            }
+            else if (option.Equals("2"))
+            {
+                Console.Clear();
+                Console.WriteLine("Under Construction. Come back later.");
+                Continue();
+            }
+            else if (option.Equals("3"))
+            {
+                Console.Clear();
+                Console.WriteLine("Under Construction. Come back later.");
+                Continue();
+            }
+            else if (option.Equals("4"))
+            {
+                Console.Clear();
+                Console.WriteLine($"Video repository of {userSesion.GetUsername().ToUpper()}.");
+                PrintVideoRepository();
+                Continue();
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("sorry I do not understand you. Please select one of the options.");
+                Continue();
+            }
+        }
 
-        public static void AddData()
+        public static User CreateUser()
+        {
+            User newUser = new User();
+            Console.WriteLine("Create new user.");
+            Console.Write("username: ");
+            newUser.SetUsername(Console.ReadLine());
+            Console.Write("name: ");
+            newUser.SetUsername(Console.ReadLine());
+            Console.Write("surname: ");
+            newUser.SetUsername(Console.ReadLine());
+            Console.Write("pasword: ");
+            newUser.SetUsername(Console.ReadLine());
+            newUser.SetRegisterDate(DateTime.Now);
+            return newUser;
+        }
+
+        // ---------- VIDEO ---------- //
+
+        public static Video CreateVideo()
+        {
+            Video video = new Video();
+            video.SetUsername(userSesion.GetUsername());
+            Console.Write("url: ");
+            video.SetUrl(Console.ReadLine());
+            Console.Write("title: ");
+            video.SetTitle(Console.ReadLine());
+            videoRepository.Add(video);
+            return video;
+        }     
+
+
+        // ---------- DATA ---------- //
+        
+        public static void LoadData()
         {
             userRepository.Add(new User("admin", "Bilbo", "Baggins", "1234", DateTime.Now));
-            userRepository.Add(new User("user1", "Frodo", "Baggind", "5678", DateTime.Now));
-            userRepository.Add(new User("user2", "Samwise", "Gamgee", "9101", DateTime.Now));
-            videoRepository.Add(new Video("user1", "www.example.com/user1", "Title1", ({ "","","" }), Video.State.Stop));
-            //string username, string url, string title, List< string > tags, State state
+            userRepository.Add(new User("frodo", "Frodo", "Baggins", "5678", DateTime.Now));
+            userRepository.Add(new User("sam", "Samwise", "Gamgee", "9101", DateTime.Now));
+            videoRepository.Add(new Video("frodo", "www.example.com/user1", "Title1"));
+            videoRepository.Add(new Video("frodo", "www.example.com/user1", "Title2"));
+            videoRepository.Add(new Video("admin", "www.example.com/admin", "Title1"));
         }
         public static void PrintUserRepository(List<User> repository)
         {
@@ -48,17 +120,71 @@ namespace ConsoleApp4
                 Console.WriteLine(one.ToString());
             }
         }
-        public static void PrintVideoRepository(List<Video> repository)
+        public static void PrintVideoRepository()
         {
-
-            foreach (Video one in repository)
+            foreach (Video one in videoRepository)
             {
                 if (one.GetUsername().Equals(userSesion.GetUsername()))
                 {
                     Console.WriteLine(one.ToString());
-                }  
+                }
             }
         }
+
+
+        // ---------- BASIC COMMANDS ---------- //
+
+        public static Boolean Exit()
+        {
+            Boolean response;
+            Boolean answerBack = false;
+            do
+            {
+                Console.Write("Do you want to exit? Y/N : ");
+                string answer = Console.ReadLine().ToUpper();
+                if (answer.Equals("Y"))
+                {
+                    response = true;
+                    answerBack = true;
+                }
+                else if (answer.Equals("N"))
+                {
+                    response = true;
+                    answerBack = false;
+                }
+                else
+                {
+                    Console.WriteLine("sorry I do not understand you. Please insert Y or N.");
+                    response = false;
+                }
+            } while (response == false);
+            return answerBack;
+        }
+
+        public static void Continue()
+        {
+            string response;
+            Console.Write("\nDo you want to return to menu? Y/N : ");
+            response = Console.ReadLine().ToLower();
+            if (response.Equals("y"))
+            {
+                Console.Clear();
+                Menu();
+            }
+            else if (response.Equals("n"))
+            {
+                Environment.Exit(0);
+            }
+            else
+            {
+                Console.WriteLine("sorry I do not understand you. Please insert Y or N.");
+                Continue();
+            }
+        }
+
+
+        // ---------- AUTHENTICATION ---------- //
+
         public static void AuthenticationModule()
         {
             Boolean authResponse;
@@ -76,12 +202,10 @@ namespace ConsoleApp4
             string usernameAuth;
             string passwordAuth;
             Boolean authResponse = false;
-
             Console.Write("username: ");
             usernameAuth = Console.ReadLine();
             Console.Write("pasword: ");
             passwordAuth = Console.ReadLine();
-
             foreach (User one in userRepository)
             {
                 if (one.GetUsername().Equals(usernameAuth) && one.GetPassword().Equals(passwordAuth))
@@ -98,255 +222,6 @@ namespace ConsoleApp4
                 Console.Clear();
             }
             return authResponse;
-        }
-        public static void Menu()
-        {
-            Console.Write($"Hello {userSesion.GetName()} {userSesion.GetSurname()}. ");
-            Console.WriteLine("What do you want to do?");
-            Console.WriteLine("1 - New video\n2 - Edit Video\n3 - Delete Video\n4 - Show Video Repository\n");
-            Console.Write("Select option: ");
-
-            switch (Console.Read())
-            {
-                case '1':
-                    Console.Write("New video.");
-                    // Continuar lógica y extraer métodos //
-                    break;
-                case '2':
-                    Console.Write("Edit video.");
-                    // Continuar lógica y extraer métodos //
-                    break;
-                case '3':
-                    Console.Write("Delete video.");
-                    // Continuar lógica y extraer métodos //
-                    break;
-                case '4':
-                    Console.Write("Show video repository");
-                    // Continuar lógica y extraer métodos //
-                    break;
-            }
-            Console.ReadKey();
-        }
-
-        public static User SetUser()
-        {
-            User newUser = new User();
-            Console.WriteLine("Create new user.");
-            Console.Write("username: ");
-            newUser.SetUsername(Console.ReadLine());
-            Console.Write("name: ");
-            newUser.SetUsername(Console.ReadLine());
-            Console.Write("surname: ");
-            newUser.SetUsername(Console.ReadLine());
-            Console.Write("pasword: ");
-            newUser.SetUsername(Console.ReadLine());
-            newUser.SetRegisterDate(DateTime.Now);
-            return newUser;
-        }
-        public static Video SetVideo()
-        {
-            Video newVideo = new Video();
-            Console.WriteLine("Create new video.");
-            Console.Write("url: ");
-            newVideo.SetUrl(Console.ReadLine());
-            Console.Write("title: ");
-            newVideo.SetTitle(Console.ReadLine());
-            List<string> tags = CreateTags();
-            return newVideo;
-        }
-        public static List<string> CreateTags()
-        {
-            List<string> tags = new List<string>();
-            Boolean exit;
-            do
-            {
-                Console.Write("Enter a new tag: ");
-                string tag = Console.ReadLine();
-                tags.Add(tag);
-                exit = Exit();
-            } while (exit == false);
-            return tags;
-        }
-        public static Boolean Exit()
-        {
-            Boolean response;
-            Boolean answerBack=false;
-            do
-            {
-                Console.Write("Do you want to exit? Y/N : ");
-                string answer = Console.ReadLine().ToUpper();
-                if (answer.Equals("Y"))
-                {
-                    response = true;
-                    answerBack = true;
-                }
-                else if (answer.Equals("N"))
-                {
-                   response = true;
-                   answerBack = false;
-                }
-                else
-                {
-                    Console.WriteLine("sorry I don not understand you. Please insert Y or N.");
-                    response = false;
-                }
-            } while (response==false);
-            return answerBack;
-        }
-    }
-
-
-    //---------------------------------------------------------------------//
-
-
-    public class Video
-    {
-        public enum State
-        {
-            Play, Pause, Stop
-        }
-        private string username;
-        private string url;
-        private string title;
-        private List<string> tags = new List<string>();
-        private State state = State.Stop;
-
-        public Video()
-        {
-
-        }
-        public Video(string username, string url, string title, List<string> tags, State state)
-        {
-            this.username = username;
-            this.url = url;
-            this.title = title;
-            this.tags = tags;
-            this.state = state;
-        }
-        public string GetUrl()
-        {
-            return this.url;
-        }
-        public void SetUrl(string url)
-        {
-            this.url = url;
-        }
-        public string GetTitle()
-        {
-            return this.title;
-        }
-        public void SetTitle(string title)
-        {
-            this.title = title;
-        }
-        public List<string> GetTags()
-        {
-            return this.tags;
-        }
-        public void SetTags(List<string> tags)
-        {
-            this.tags = tags;
-        }
-        public State GetState()
-        {
-            return this.state;
-        }
-        public void SetState(State state)
-        {
-            this.state = state;
-        }
-        public string GetUsername()
-        {
-            return username;
-        }
-        public void SetUsername(string username)
-        {
-            this.username = username;
-        }
-        public override string ToString()
-        {
-            return base.ToString() + ": " + url.ToString() + " " + title.ToString() + ", tags: " + tags.ToString();
-        }
-    }
-
-    public class User
-    {
-        private string name;
-        private string surname;
-        private string username;
-        private string password;
-        private DateTime registerDate; 
-        private string token = "";
-        public User()
-        {
-
-        }
-        public User(string username, string name, string surname, string password, DateTime registerDate)
-        {
-            this.username = username;
-            this.name = name;
-            this.surname = surname;
-            this.password = password;
-            this.registerDate = registerDate;
-            
-        }
-        public User(string token)
-        {
-            this.token = token;
-        }
-        public string GetUsername()
-        {
-            return this.username;
-        }
-        public void SetUsername(string username)
-        {
-            // condition ? consequent : alternative
-            //username != string.Empty && username != null ? this.username=username : throw new ArgumentNullException("username cannot be empty or null");
-            this.username = username;
-        }
-        public string GetName()
-        {
-            return this.name;
-        }
-        public void SetName(string name)
-        {
-            this.name = name;
-        }
-        public string GetSurname()
-        {
-            return this.surname;
-        }
-        public void SetSurname(string surname)
-        {
-            this.surname = surname;
-        }
-        public string GetPassword()
-        {
-            return this.password;
-        }
-        public void SetPassword(string password)
-        {
-            this.password = password;
-        }
-        public DateTime GetRegisterDate()
-        {
-            return this.registerDate;
-        }
-        public void SetRegisterDate(DateTime registerDate)
-        {
-            this.registerDate = registerDate;
-        }
-        public string GetToken()
-        {
-            return this.token;
-        }
-        public void SetToken(string token)
-        {
-            this.token = token;
-        }
-        public override string ToString()
-        {
-            return base.ToString() + ": " + name.ToString() + " " + surname.ToString() + ", username: " + username.ToString() + " password: " + password.ToString() + ", tokenAUTH: " + token.ToString();
         }
     }
 }
