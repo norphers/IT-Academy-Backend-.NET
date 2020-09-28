@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace ConsoleApp4
@@ -29,56 +30,20 @@ namespace ConsoleApp4
         {
             this.token = token;
         }
-        public string GetUsername()
+
+
+        public string Name
         {
-            return this.username;
+            get { return name; }
+            set => name = !string.IsNullOrEmpty(value) ? value : throw new ArgumentException("field cannot be empty or null");
         }
-        public void SetUsername(string username)
-        {
-            // condition ? consequent : alternative
-            //username != string.Empty && username != null ? this.username=username : throw new ArgumentNullException("username cannot be empty or null");
-            this.username = username;
-        }
-        public string GetName()
-        {
-            return this.name;
-        }
-        public void SetName(string name)
-        {
-            this.name = name;
-        }
-        public string GetSurname()
-        {
-            return this.surname;
-        }
-        public void SetSurname(string surname)
-        {
-            this.surname = surname;
-        }
-        public string GetPassword()
-        {
-            return this.password;
-        }
-        public void SetPassword(string password)
-        {
-            this.password = password;
-        }
-        public DateTime GetRegisterDate()
-        {
-            return this.registerDate;
-        }
-        public void SetRegisterDate(DateTime registerDate)
-        {
-            this.registerDate = registerDate;
-        }
-        public string GetToken()
-        {
-            return this.token;
-        }
-        public void SetToken(string token)
-        {
-            this.token = token;
-        }
+        public string Surname { get { return surname; } set { surname = value; } }
+        public string Username { get { return username; } set { username = value; } }
+        public string Password { get { return password; }  set { password = value; } }
+        public DateTime RegisterDate { get { return registerDate; } set { registerDate = value; } }
+        public string Token { get { return token; } set { token = value; } }
+
+
         public override string ToString()
         {
             return base.ToString() + ": " + name.ToString() + " " + surname.ToString() + ", username: " + username.ToString() + " password: " + password.ToString() + ", tokenAUTH: " + token.ToString();

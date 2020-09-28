@@ -8,6 +8,8 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.VisualBasic.CompilerServices;
 using System.Net.Http.Headers;
 using System.Reflection.Metadata.Ecma335;
+using System.Diagnostics.Tracing;
+using System.Net.NetworkInformation;
 
 namespace ConsoleApp4
 {
@@ -21,69 +23,73 @@ namespace ConsoleApp4
             LoadData();
             AuthenticationModule();
             Menu();
-
-            // add tags to Video
-            // option 2 (edit video)
-            // delete video
         }
 
 
         //----------------------------------------------//
-        
+
         public static void Menu()
         {
-            Console.Write($"Hello {userSesion.GetName()} {userSesion.GetSurname()}. ");
+            Console.Write($"Hello {userSesion.Name} {userSesion.Surname}. ");
             Console.WriteLine("What do you want to do?");
-            Console.WriteLine("1 - New video\n2 - Edit Video\n3 - Delete Video\n4 - Show Video Repository\n");
+            Console.WriteLine("1 - New video\n2 - Edit Video\n3 - Delete Video\n4 - Show Video Repository\n5 - Create new User\n");
             Console.Write("Select option: ");
             string option = Console.ReadLine();
             if (option.Equals("1"))
             {
                 Console.Clear();
-                Console.Write("Create new video.");
+                Console.WriteLine("Create new video.");
                 CreateVideo();
-                Continue();
+                ReturnMenu();
             }
-            else if (option.Equals("2"))
+            else if (option.Equals("2")) //standby
             {
                 Console.Clear();
                 Console.WriteLine("Under Construction. Come back later.");
-                Continue();
+                ReturnMenu();
             }
-            else if (option.Equals("3"))
+            else if (option.Equals("3")) //standby
             {
                 Console.Clear();
                 Console.WriteLine("Under Construction. Come back later.");
-                Continue();
+                ReturnMenu();
             }
             else if (option.Equals("4"))
             {
                 Console.Clear();
-                Console.WriteLine($"Video repository of {userSesion.GetUsername().ToUpper()}.");
+                Console.WriteLine($"Video repository of {userSesion.Username.ToUpper()}.");
                 PrintVideoRepository();
-                Continue();
+                ReturnMenu();
+            }
+            else if (option.Equals("5"))
+            {
+                Console.Clear();
+                Console.WriteLine("Create new user.");
+                CreateUser();
+                PrintVideoRepository();
+                ReturnMenu();
             }
             else
             {
                 Console.Clear();
                 Console.WriteLine("sorry I do not understand you. Please select one of the options.");
-                Continue();
+                ReturnMenu();
             }
         }
 
         public static User CreateUser()
         {
             User newUser = new User();
-            Console.WriteLine("Create new user.");
-            Console.Write("username: ");
-            newUser.SetUsername(Console.ReadLine());
             Console.Write("name: ");
-            newUser.SetUsername(Console.ReadLine());
+            newUser.Name = Console.ReadLine();
             Console.Write("surname: ");
-            newUser.SetUsername(Console.ReadLine());
+            newUser.Surname = Console.ReadLine();
+            Console.Write("username: ");
+            newUser.Username = Console.ReadLine();
             Console.Write("pasword: ");
-            newUser.SetUsername(Console.ReadLine());
-            newUser.SetRegisterDate(DateTime.Now);
+            newUser.Password = Console.ReadLine();
+            newUser.RegisterDate = DateTime.Now;
+            userRepository.Add(newUser);
             return newUser;
         }
 
@@ -91,16 +97,22 @@ namespace ConsoleApp4
 
         public static Video CreateVideo()
         {
+            Boolean response;
             Video video = new Video();
-            video.SetUsername(userSesion.GetUsername());
+            video.Username = userSesion.Username;
             Console.Write("url: ");
-            video.SetUrl(Console.ReadLine());
+            video.Url = Console.ReadLine();
             Console.Write("title: ");
-            video.SetTitle(Console.ReadLine());
+            video.Title = Console.ReadLine();
+            do
+            {
+                Console.Write("tag: ");
+                video.Tags.Add(video.Tag = Console.ReadLine());
+                response = Continue();
+            } while (response == true);
             videoRepository.Add(video);
             return video;
-        }     
-
+        }
 
         // ---------- DATA ---------- //
         
@@ -124,13 +136,23 @@ namespace ConsoleApp4
         {
             foreach (Video one in videoRepository)
             {
-                if (one.GetUsername().Equals(userSesion.GetUsername()))
+                if (one.Username.Equals(userSesion.Username))
                 {
                     Console.WriteLine(one.ToString());
+                    Console.Write("tags: ");
+                    PrintTagsRepository(one);
+                    Console.Write("\n");
                 }
             }
         }
 
+        public static void PrintTagsRepository(Video video)
+        {
+            foreach(string tag in video.Tags)
+            {
+                Console.Write(tag + " ");
+            }
+        }
 
         // ---------- BASIC COMMANDS ---------- //
 
@@ -161,7 +183,7 @@ namespace ConsoleApp4
             return answerBack;
         }
 
-        public static void Continue()
+        public static void ReturnMenu()
         {
             string response;
             Console.Write("\nDo you want to return to menu? Y/N : ");
@@ -178,10 +200,31 @@ namespace ConsoleApp4
             else
             {
                 Console.WriteLine("sorry I do not understand you. Please insert Y or N.");
-                Continue();
+                ReturnMenu();
             }
         }
 
+        public static Boolean Continue()
+        {
+            string answer;
+            Boolean response;
+            Console.Write("\nDo you want to continue? Y/N : ");
+            answer = Console.ReadLine().ToLower();
+            if (answer.Equals("y"))
+            {
+                response = true;
+            }
+            else if (answer.Equals("n"))
+            {
+                response = false;
+            }
+            else
+            {
+                Console.WriteLine("sorry I do not understand you. Please insert Y or N.");
+                response = Continue();
+            }
+            return response;
+        }
 
         // ---------- AUTHENTICATION ---------- //
 
@@ -208,10 +251,10 @@ namespace ConsoleApp4
             passwordAuth = Console.ReadLine();
             foreach (User one in userRepository)
             {
-                if (one.GetUsername().Equals(usernameAuth) && one.GetPassword().Equals(passwordAuth))
+                if (one.Username.Equals(usernameAuth) && one.Password.Equals(passwordAuth))
                 {
                     authResponse = true;
-                    one.SetToken(System.Guid.NewGuid().ToString());
+                    one.Token = System.Guid.NewGuid().ToString();
                     userSesion = one;
                     Console.Clear();
                 }
