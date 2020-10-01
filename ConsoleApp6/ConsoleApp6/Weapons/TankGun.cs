@@ -4,11 +4,11 @@ using System.Text;
 
 namespace ConsoleApp6.Weapons
 {
-    class Sniper : ISoldierWeapons
+    class TankGun : ITankWeapons
     {
         public void Hit(string target)
         {
-            Console.WriteLine("{0} get headshot.", target);
+            Console.WriteLine("{0} had been erased.", target);
         }
 
     }

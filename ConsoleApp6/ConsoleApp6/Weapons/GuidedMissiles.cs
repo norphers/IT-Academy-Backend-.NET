@@ -4,11 +4,11 @@ using System.Text;
 
 namespace ConsoleApp6.Weapons
 {
-    class Sniper : ISoldierWeapons
+    class GuidedMissiles : ITankWeapons
     {
         public void Hit(string target)
         {
-            Console.WriteLine("{0} get headshot.", target);
+            Console.WriteLine("Target selected. {0} had been eliminated.", target);
         }
 
     }

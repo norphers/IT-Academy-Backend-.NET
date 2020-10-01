@@ -7,14 +7,14 @@ namespace ConsoleApp6
 {
     class ModernSoldier
     {
-        IWeapon weapon;
+        private ISoldierWeapons weapon;
 
-        public ModernSoldier(IWeapon weapon)
+        public ModernSoldier(ISoldierWeapons weapon)
         {
             this.weapon = weapon;
         }
 
-        public void ChangeWeapon(IWeapon weapon)
+        public void ChangeWeapon(ISoldierWeapons weapon)
         {
             this.weapon = weapon;
         } 

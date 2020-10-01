@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ConsoleApp6.Weapons
 {
-    class MachineGun : IWeapon
+    class MachineGun : ISoldierWeapons
     {
         public void Hit(string target)
         {

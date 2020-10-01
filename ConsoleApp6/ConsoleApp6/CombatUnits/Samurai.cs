@@ -7,8 +7,8 @@ namespace ConsoleApp6
 {
     class Samurai
     {
-        readonly IWeapon weapon;
-        public Samurai (IWeapon weapon)
+        readonly ISamurayWeapons weapon;
+        public Samurai (ISamurayWeapons weapon)
         {
             this.weapon = weapon;
         }

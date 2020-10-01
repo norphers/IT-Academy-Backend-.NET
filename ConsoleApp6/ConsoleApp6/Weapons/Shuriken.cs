@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ConsoleApp6
 {
-    class Shuriken : IWeapon
+    class Shuriken : ISamurayWeapons
     {
         public void Hit(string target)
         {

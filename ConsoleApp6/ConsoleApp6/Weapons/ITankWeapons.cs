@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ConsoleApp6
+namespace ConsoleApp6.Weapons
 {
-    interface IWeapon
+    interface ITankWeapons
     {
         void Hit(string target);
     }
